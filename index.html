@@ -5,34 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jaris განრიგი</title>
     <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/jpeg" sizes="192x192" href="m.jpg">
-    <!-- Favicon linking -->
-    <!-- App icon for mobile (when saved to home screen) -->
-    <!-- App icon -->
-<link rel="apple-touch-icon" href="1.jpg">
-<link rel="icon" type="image/jpeg" href="1.jpg">
+    <link rel="icon" type="image/jpeg" sizes="192x192" href="m.jpg">
+    <link rel="apple-touch-icon" href="1.jpg">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Volvo განრიგი">
+    <meta name="theme-color" content="#ffffff">
 
-<!-- Progressive Web App Metadata -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Volvo განრიგი">
-<meta name="theme-color" content="#ffffff">
-<link rel="apple-touch-icon" href="1.jpg">
-    <link rel="manifest" href="manifest.json">
-
-<!-- Favicon for browsers -->
-<link rel="icon" type="image/jpeg" href="1.jpg">
-
-<!-- Progressive Web App metadata -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="App Name">
-    <link rel="icon" href="1.jpg" type="image/jpg">
-     <link rel="icon" href="1.png" type="image/png">
-    <!-- Web App Manifest linking -->
-    <link rel="manifest" href="manifest.json">
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -106,10 +85,6 @@
             text-align: center;
         }
 
-        .nav-button:active {
-            background: #1e40af;
-        }
-
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -133,25 +108,10 @@
             transform: scale(0.95);
         }
 
-        .green {
-            background-color: var(--work-day);
-            color: white;
-        }
-
-        .white {
-            background-color: var(--rest-day);
-            color: var(--text-color);
-        }
-
-        .past-green {
-            background-color: var(--past-work-day);
-            color: white;
-        }
-
-        .past-white {
-            background-color: var(--past-rest-day);
-            color: var(--text-color);
-        }
+        .green { background-color: var(--work-day); color: white; }
+        .white { background-color: var(--rest-day); color: var(--text-color); }
+        .past-green { background-color: var(--past-work-day); color: white; }
+        .past-white { background-color: var(--past-rest-day); color: var(--text-color); }
 
         .weekday-header {
             font-weight: bold;
@@ -161,48 +121,16 @@
             font-size: 0.85rem;
         }
 
-        /* Mobile Styles */
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.4rem;
-            }
-
-            .calendar {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 4px;
-                padding: 8px;
-            }
-
-            .date-cell {
-                padding: 8px;
-                font-size: 0.8rem;
-            }
-
-            .weekday-header {
-                font-size: 0.75rem;
-                padding: 6px;
-            }
-
-            .message-container {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
-
-            .nav-button {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-                max-width: 100px;
-            }
+            h1 { font-size: 1.4rem; }
+            .calendar { grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 8px; }
+            .date-cell { padding: 8px; font-size: 0.8rem; }
+            .nav-button { padding: 6px 12px; font-size: 0.8rem; max-width: 100px; }
         }
 
         @media (max-width: 400px) {
-            .calendar {
-                grid-template-columns: 1fr;
-            }
-
-            .weekday-header {
-                display: none;
-            }
+            .calendar { grid-template-columns: 1fr; }
+            .weekday-header { display: none; }
         }
     </style>
 </head>
@@ -222,41 +150,26 @@
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration);
-                if (registration.waiting) {
-                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                }
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('New version available. Reloading...');
-                            window.location.reload();
-                        }
-                    });
-                });
-            })
-            .catch(error => {
-                console.error('Service Worker registration failed:', error);
-            });
+            .then(registration => console.log('Service Worker registered'))
+            .catch(error => console.error('Service Worker failed:', error));
     }
 
-    // Calendar Logic
     const months = ["იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი", "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
     const weekdays = ["კვი", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
+    
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    const startDate = new Date("2026-07-25"); // Starting point for the schedule
-    const endDate = new Date("2027-01-04"); // End date for the schedule
+    
+    const startDate = new Date("2026-07-25"); // დაწყების თარიღი
 
     function generateCalendar() {
         const calendarContainer = document.getElementById("calendar");
         const messageContainer = document.getElementById("message");
         const currentMonthDisplay = document.getElementById("current-month");
+        
         calendarContainer.innerHTML = '';
 
-        // Add weekday headers
+        // Weekday headers
         if (window.innerWidth > 400) {
             weekdays.forEach(day => {
                 const header = document.createElement("div");
@@ -266,64 +179,58 @@
             });
         }
 
-        // Calculate dates for the current month
         const monthStart = new Date(currentYear, currentMonth, 1);
         const monthEnd = new Date(currentYear, currentMonth + 1, 0);
         const currentDateObj = new Date();
         const tomorrowDateObj = new Date(currentDateObj);
         tomorrowDateObj.setDate(currentDateObj.getDate() + 1);
 
-        // Set current month display
         currentMonthDisplay.innerText = `${months[currentMonth]} ${currentYear}`;
 
-        // Add empty cells for days before the 1st
+        // Empty cells
         const firstDay = monthStart.getDay();
         for (let i = 0; i < firstDay; i++) {
-            const emptyCell = document.createElement("div");
-            calendarContainer.appendChild(emptyCell);
+            calendarContainer.appendChild(document.createElement("div"));
         }
 
-        // Calculate days since startDate for work/rest cycle
         let currentDate = new Date(monthStart);
         while (currentDate <= monthEnd) {
             const dateCell = document.createElement("div");
             dateCell.classList.add("date-cell");
 
-            // Calculate days since startDate
+            // 1 დღე მუშაობა + 2 დღე დასვენება
             const timeDiff = currentDate - startDate;
             const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            const cycleDay = daysSinceStart % 4; // 4-day cycle (2 work, 2 rest)
+            const cycleDay = daysSinceStart % 3;
 
-            // Apply work/rest day styles
-            if (cycleDay < 2) {
-                dateCell.classList.add("green"); // Work days
+            if (cycleDay === 0) {
+                dateCell.classList.add("green"); // მუშაობა
             } else {
-                dateCell.classList.add("white"); // Rest days
+                dateCell.classList.add("white"); // დასვენება
             }
 
             const day = currentDate.getDate();
             const weekday = weekdays[currentDate.getDay()];
-            dateCell.innerText = `${day}\n${weekday}`;
+            dateCell.innerText = `\( {day}\n \){weekday}`;
 
             // Past days
             if (currentDate < currentDateObj) {
                 if (dateCell.classList.contains("green")) {
                     dateCell.classList.remove("green");
                     dateCell.classList.add("past-green");
-                } else if (dateCell.classList.contains("white")) {
+                } else {
                     dateCell.classList.remove("white");
                     dateCell.classList.add("past-white");
                 }
             }
 
             // Tomorrow message
-            if (
-                currentDate.getFullYear() === tomorrowDateObj.getFullYear() &&
+            if (currentDate.getFullYear() === tomorrowDateObj.getFullYear() &&
                 currentDate.getMonth() === tomorrowDateObj.getMonth() &&
-                currentDate.getDate() === tomorrowDateObj.getDate()
-            ) {
-                messageContainer.innerHTML = dateCell.classList.contains("green")
-                    ? "ხვალ მუშაობ 😱"
+                currentDate.getDate() === tomorrowDateObj.getDate()) {
+                
+                messageContainer.innerHTML = dateCell.classList.contains("green") 
+                    ? "ხვალ მუშაობ 😱" 
                     : "ხვალ არ მუშაობ 😍🥳";
             }
 
@@ -350,14 +257,9 @@
         generateCalendar();
     }
 
-    // Initial calendar generation
+    // Initialize
     generateCalendar();
-
-    // Update calendar on window resize
     window.addEventListener('resize', generateCalendar);
 </script>
 </body>
 </html>
-
-
-
