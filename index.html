@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jaris განრიგი</title>
+    <title>Volvo განრიგი</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/jpeg" sizes="192x192" href="m.jpg">
     <link rel="apple-touch-icon" href="1.jpg">
@@ -54,12 +54,12 @@
         .message-container {
             background: white;
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
         .navigation {
@@ -75,62 +75,88 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 10px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.3s;
+            font-size: 0.95rem;
             flex: 1;
-            max-width: 120px;
-            text-align: center;
+            max-width: 130px;
         }
 
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 6px;
             background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .date-cell {
-            padding: 10px;
+            padding: 8px 4px;
             text-align: center;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            line-height: 1.4;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.25;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             transition: transform 0.2s;
         }
 
         .date-cell:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
+        }
+
+        .date-cell .day-number {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .date-cell .weekday {
+            font-size: 0.75rem;
+            opacity: 0.9;
         }
 
         .green { background-color: var(--work-day); color: white; }
-        .white { background-color: var(--rest-day); color: var(--text-color); }
+        .white { background-color: var(--rest-day); color: white; }
         .past-green { background-color: var(--past-work-day); color: white; }
-        .past-white { background-color: var(--past-rest-day); color: var(--text-color); }
+        .past-white { background-color: var(--past-rest-day); color: white; }
 
         .weekday-header {
             font-weight: bold;
             text-align: center;
-            padding: 8px;
+            padding: 8px 4px;
             color: var(--primary-color);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
+        /* Mobile */
         @media (max-width: 600px) {
-            h1 { font-size: 1.4rem; }
-            .calendar { grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 8px; }
-            .date-cell { padding: 8px; font-size: 0.8rem; }
-            .nav-button { padding: 6px 12px; font-size: 0.8rem; max-width: 100px; }
+            .calendar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 10px;
+            }
+            .date-cell {
+                min-height: 80px;
+                padding: 10px 6px;
+            }
+            .date-cell .day-number {
+                font-size: 1.45rem;
+            }
         }
 
         @media (max-width: 400px) {
-            .calendar { grid-template-columns: 1fr; }
-            .weekday-header { display: none; }
+            .calendar {
+                grid-template-columns: 1fr;
+            }
+            .weekday-header {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -147,11 +173,8 @@
     </div>
 
 <script>
-    // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => console.log('Service Worker registered'))
-            .catch(error => console.error('Service Worker failed:', error));
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
     }
 
     const months = ["იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი", "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
@@ -159,8 +182,7 @@
     
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    
-    const startDate = new Date("2026-07-25"); // დაწყების თარიღი
+    const startDate = new Date("2026-07-25");
 
     function generateCalendar() {
         const calendarContainer = document.getElementById("calendar");
@@ -169,7 +191,6 @@
         
         calendarContainer.innerHTML = '';
 
-        // Weekday headers
         if (window.innerWidth > 400) {
             weekdays.forEach(day => {
                 const header = document.createElement("div");
@@ -181,15 +202,14 @@
 
         const monthStart = new Date(currentYear, currentMonth, 1);
         const monthEnd = new Date(currentYear, currentMonth + 1, 0);
-        const currentDateObj = new Date();
-        const tomorrowDateObj = new Date(currentDateObj);
-        tomorrowDateObj.setDate(currentDateObj.getDate() + 1);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
 
         currentMonthDisplay.innerText = `${months[currentMonth]} ${currentYear}`;
 
         // Empty cells
-        const firstDay = monthStart.getDay();
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < monthStart.getDay(); i++) {
             calendarContainer.appendChild(document.createElement("div"));
         }
 
@@ -198,23 +218,26 @@
             const dateCell = document.createElement("div");
             dateCell.classList.add("date-cell");
 
-            // 1 დღე მუშაობა + 2 დღე დასვენება
             const timeDiff = currentDate - startDate;
             const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
             const cycleDay = daysSinceStart % 3;
 
             if (cycleDay === 0) {
-                dateCell.classList.add("green"); // მუშაობა
+                dateCell.classList.add("green");
             } else {
-                dateCell.classList.add("white"); // დასვენება
+                dateCell.classList.add("white");
             }
 
-            const day = currentDate.getDate();
+            const dayNum = currentDate.getDate();
             const weekday = weekdays[currentDate.getDay()];
-            dateCell.innerText = `\( {day}\n \){weekday}`;
 
-            // Past days
-            if (currentDate < currentDateObj) {
+            dateCell.innerHTML = `
+                <div class="day-number">${dayNum}</div>
+                <div class="weekday">${weekday}</div>
+            `;
+
+            // Past days styling
+            if (currentDate < today) {
                 if (dateCell.classList.contains("green")) {
                     dateCell.classList.remove("green");
                     dateCell.classList.add("past-green");
@@ -225,11 +248,11 @@
             }
 
             // Tomorrow message
-            if (currentDate.getFullYear() === tomorrowDateObj.getFullYear() &&
-                currentDate.getMonth() === tomorrowDateObj.getMonth() &&
-                currentDate.getDate() === tomorrowDateObj.getDate()) {
+            if (currentDate.getFullYear() === tomorrow.getFullYear() &&
+                currentDate.getMonth() === tomorrow.getMonth() &&
+                currentDate.getDate() === tomorrow.getDate()) {
                 
-                messageContainer.innerHTML = dateCell.classList.contains("green") 
+                messageContainer.innerHTML = cycleDay === 0 
                     ? "ხვალ მუშაობ 😱" 
                     : "ხვალ არ მუშაობ 😍🥳";
             }
@@ -241,23 +264,16 @@
 
     function prevMonth() {
         currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
         generateCalendar();
     }
 
     function nextMonth() {
         currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
         generateCalendar();
     }
 
-    // Initialize
     generateCalendar();
     window.addEventListener('resize', generateCalendar);
 </script>
