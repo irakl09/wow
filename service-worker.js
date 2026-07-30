@@ -1,10 +1,10 @@
-const CACHE_NAME = 'jaris-ganrigi-v1';
+const CACHE_NAME = 'jaris-ganrigi-v2';
 const CORE_ASSETS = [
-    './duty-schedule.html',
+    './',
+    './index.html',
     './manifest.json',
     './icon-192.png',
-    './icon-512.png',
-    './apple-touch-icon.png'
+    './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -23,8 +23,6 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Cache-first with background revalidation, so the app works fully offline
-// after the first visit, and quietly updates cached assets when online.
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
