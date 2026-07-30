@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ჯარის განრიგი</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/jpeg" sizes="192x192" href="m.jpg">
-    <link rel="apple-touch-icon" href="1.jpg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="ჯარის განრიგი">
@@ -138,6 +139,49 @@
 
         .remaining-sub {
             margin-top: 4px;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        .progress-track {
+            margin-top: 12px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--olive), var(--duty));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-label {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .remaining-progress-track {
+            margin-top: 12px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+        }
+
+        .remaining-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--duty), var(--gold));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .remaining-percent {
+            margin-top: 6px;
             font-size: 0.78rem;
             color: var(--text-dim);
         }
@@ -392,6 +436,103 @@
             content: '';
         }
 
+        .date-cell {
+            cursor: pointer;
+        }
+
+        .note-dot {
+            position: absolute;
+            top: 5px;
+            right: 6px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+        }
+
+        /* Note modal */
+        .note-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5,8,14,0.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        .note-modal-overlay.active {
+            display: flex;
+        }
+
+        .note-modal {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 18px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .note-modal-date {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        #note-input {
+            width: 100%;
+            min-height: 70px;
+            resize: vertical;
+            background: var(--bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            padding: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        #note-input:focus {
+            outline: 2px solid var(--gold);
+            outline-offset: 1px;
+        }
+
+        .note-modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .note-modal-actions button {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 9px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid var(--panel-border);
+            background: transparent;
+            color: var(--text-dim);
+        }
+
+        #note-save {
+            background: var(--duty);
+            border-color: var(--duty);
+            color: #f2f7ee;
+            flex: 1;
+        }
+
+        #note-delete {
+            border-color: var(--free-dim);
+            color: var(--free);
+        }
+
         /* Discharge celebration screen */
         .discharge-screen {
             position: relative;
@@ -490,6 +631,234 @@
             100% { transform: translateY(-560px) translateX(24px); opacity: 0; }
         }
 
+        /* Month transition — 3D flip */
+        .calendar-wrap {
+            position: relative;
+            perspective: 1200px;
+        }
+
+        .calendar {
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            will-change: transform, opacity;
+        }
+
+        .calendar.flip-out-next {
+            animation: flipOutNext 0.2s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+        }
+        .calendar.flip-out-prev {
+            animation: flipOutPrev 0.2s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+        }
+        .calendar.flip-in-next {
+            animation: flipInNext 0.28s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        .calendar.flip-in-prev {
+            animation: flipInPrev 0.28s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes flipOutNext {
+            0% { transform: rotateY(0deg); opacity: 1; }
+            100% { transform: rotateY(-95deg); opacity: 0.3; }
+        }
+        @keyframes flipOutPrev {
+            0% { transform: rotateY(0deg); opacity: 1; }
+            100% { transform: rotateY(95deg); opacity: 0.3; }
+        }
+        @keyframes flipInNext {
+            0% { transform: rotateY(95deg); opacity: 0.3; }
+            100% { transform: rotateY(0deg); opacity: 1; }
+        }
+        @keyframes flipInPrev {
+            0% { transform: rotateY(-95deg); opacity: 0.3; }
+            100% { transform: rotateY(0deg); opacity: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .calendar.flip-out-next, .calendar.flip-out-prev,
+            .calendar.flip-in-next, .calendar.flip-in-prev {
+                animation: none !important;
+            }
+        }
+
+        /* Day note indicator + modal */
+        .date-cell.has-note::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5,8,14,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 18px;
+            width: 100%;
+            max-width: 360px;
+        }
+        .modal-date {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 10px;
+            letter-spacing: 0.03em;
+        }
+        .modal-box textarea {
+            width: 100%;
+            min-height: 90px;
+            resize: vertical;
+            background: var(--bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+        .modal-box textarea:focus {
+            outline: 2px solid var(--gold);
+            outline-offset: 1px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .modal-actions button {
+            flex: 1;
+            padding: 9px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--panel-border);
+            background: transparent;
+            color: var(--text-dim);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-actions button:hover {
+            border-color: var(--olive);
+            color: var(--text);
+        }
+        .modal-actions .save-btn {
+            border-color: var(--duty);
+            color: var(--duty);
+        }
+        .modal-actions .delete-btn {
+            border-color: var(--free);
+            color: var(--free);
+        }
+
+        /* Install prompt banner */
+        .install-banner {
+            position: fixed;
+            left: 14px;
+            right: 14px;
+            bottom: 14px;
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-left: 3px solid var(--gold);
+            border-radius: 6px;
+            padding: 14px 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 100;
+            animation: bannerRise 0.35s ease;
+        }
+        .install-banner.show {
+            display: flex;
+        }
+
+        @keyframes bannerRise {
+            from { transform: translateY(16px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .install-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .install-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .install-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.01em;
+        }
+
+        .install-sub {
+            font-size: 0.76rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+
+        .install-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .install-btn {
+            background: var(--duty);
+            color: #f2f7ee;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .install-close {
+            background: transparent;
+            border: none;
+            color: var(--text-faint);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            line-height: 1;
+        }
+
+        @media (max-width: 420px) {
+            .install-sub { display: none; }
+        }
+
         /* Mobile */
         @media (max-width: 600px) {
             .calendar {
@@ -533,7 +902,9 @@
                 <span id="current-month"></span>
                 <button class="nav-button" id="next-btn" onclick="nextMonth()">შემდეგი →</button>
             </div>
-            <div class="calendar" id="calendar"></div>
+            <div class="calendar-wrap" id="calendar-wrap">
+                <div class="calendar" id="calendar"></div>
+            </div>
             <div class="stats-bar" id="stats"></div>
         </div>
 
@@ -559,10 +930,90 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="note-modal-overlay">
+        <div class="modal-box">
+            <div class="modal-date" id="note-modal-date"></div>
+            <textarea id="note-textarea" placeholder="შენიშვნა ამ დღისთვის..."></textarea>
+            <div class="modal-actions">
+                <button onclick="closeNoteModal()">გაუქმება</button>
+                <button class="delete-btn" onclick="deleteNoteHandler()">წაშლა</button>
+                <button class="save-btn" onclick="saveNoteHandler()">შენახვა</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="install-banner" id="install-banner">
+        <img class="install-icon" src="icon-192.png" alt="">
+        <div class="install-text">
+            <div class="install-title" id="install-title">დააინსტალირეთ აპლიკაცია</div>
+            <div class="install-sub" id="install-sub">დაამატეთ სახლის ეკრანზე, სამუშაოდ ინტერნეტის გარეშეც</div>
+        </div>
+        <div class="install-actions" id="install-actions">
+            <button class="install-btn" id="install-btn">დაინსტალირება</button>
+            <button class="install-close" id="install-close" aria-label="დახურვა">✕</button>
+        </div>
+    </div>
+
 <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
     }
+
+    (function setupInstallPrompt() {
+        const banner = document.getElementById('install-banner');
+        const btn = document.getElementById('install-btn');
+        const closeBtn = document.getElementById('install-close');
+        const titleEl = document.getElementById('install-title');
+        const subEl = document.getElementById('install-sub');
+
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+
+        if (isStandalone) return;
+        if (localStorage.getItem('install-banner-dismissed') === 'true') return;
+
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+
+        function dismiss() {
+            banner.classList.remove('show');
+            localStorage.setItem('install-banner-dismissed', 'true');
+        }
+
+        closeBtn.addEventListener('click', dismiss);
+
+        if (isIOS) {
+            titleEl.textContent = 'დაამატეთ სახლის ეკრანზე';
+            subEl.textContent = 'გახსენით Share მენიუ და აირჩიეთ „Add to Home Screen“';
+            btn.textContent = 'გასაგებია';
+            btn.addEventListener('click', dismiss);
+            setTimeout(() => banner.classList.add('show'), 1200);
+            return;
+        }
+
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            banner.classList.add('show');
+        });
+
+        btn.addEventListener('click', async () => {
+            if (!deferredPrompt) { dismiss(); return; }
+            banner.classList.remove('show');
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice.catch(() => null);
+            deferredPrompt = null;
+            if (choice && choice.outcome === 'dismissed') {
+                localStorage.setItem('install-banner-dismissed', 'true');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            banner.classList.remove('show');
+            localStorage.setItem('install-banner-dismissed', 'true');
+        });
+    })();
 
     const months = ["იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი", "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
     const weekdays = ["კვი", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
@@ -590,6 +1041,64 @@
         return ((days % 3) + 3) % 3;
     }
 
+    function dateKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function loadNotes() {
+        try {
+            return JSON.parse(localStorage.getItem('duty-notes') || '{}');
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveNotes(notes) {
+        try {
+            localStorage.setItem('duty-notes', JSON.stringify(notes));
+        } catch (e) {}
+    }
+
+    let editingKey = null;
+
+    function openNoteModal(date) {
+        editingKey = dateKey(date);
+        const notes = loadNotes();
+        document.getElementById("note-modal-date").innerText =
+            `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        document.getElementById("note-textarea").value = notes[editingKey] || '';
+        document.getElementById("note-modal-overlay").classList.add("open");
+        document.getElementById("note-textarea").focus();
+    }
+
+    function closeNoteModal() {
+        document.getElementById("note-modal-overlay").classList.remove("open");
+        editingKey = null;
+    }
+
+    function saveNoteHandler() {
+        if (!editingKey) return;
+        const text = document.getElementById("note-textarea").value.trim();
+        const notes = loadNotes();
+        if (text) {
+            notes[editingKey] = text;
+        } else {
+            delete notes[editingKey];
+        }
+        saveNotes(notes);
+        closeNoteModal();
+        generateCalendar();
+    }
+
+    function deleteNoteHandler() {
+        if (!editingKey) return;
+        const notes = loadNotes();
+        delete notes[editingKey];
+        saveNotes(notes);
+        closeNoteModal();
+        generateCalendar();
+    }
+
     function countDutyDaysBetween(from, to) {
         let count = 0;
         let d = new Date(from);
@@ -603,9 +1112,16 @@
     function renderRemaining(startOfToday) {
         const remainingContainer = document.getElementById("remaining-card");
         const remaining = countDutyDaysBetween(startOfToday, endDate);
+
+        const totalMs = endDate - startDate;
+        const elapsedMs = Math.min(Math.max(startOfToday - startDate, 0), totalMs);
+        const percent = totalMs > 0 ? Math.round((elapsedMs / totalMs) * 100) : 0;
+
         remainingContainer.innerHTML = `
             <div class="remaining-label">დარჩენილი განაწესის დღეები</div>
             <div class="remaining-number">${remaining}<span>4 იანვრამდე</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
+            <div class="progress-label">გავლილია ${percent}%</div>
         `;
     }
 
@@ -660,10 +1176,11 @@
     function renderStats(dutyCount, freeCount) {
         const statsContainer = document.getElementById("stats");
         statsContainer.innerHTML = `
-            <div class="stat-chip"><span class="dot dot-duty"></span>სამსახური: <strong>${dutyCount}</strong></div>
-            <div class="stat-chip"><span class="dot dot-free"></span>თავისუფალი: <strong>${freeCount}</strong></div>
+            <div class="stat-chip"><span class="dot dot-duty"></span>დარჩენილი სამსახური: <strong>${dutyCount}</strong></div>
+            <div class="stat-chip"><span class="dot dot-free"></span>დარჩენილი თავისუფალი: <strong>${freeCount}</strong></div>
         `;
     }
+
 
     function checkDischarge(startOfToday) {
         const appContent = document.getElementById("app-content");
@@ -720,6 +1237,7 @@
             calendarContainer.appendChild(document.createElement("div"));
         }
 
+        const notes = loadNotes();
         let currentDate = new Date(monthStart);
         while (currentDate <= monthEnd) {
             const dateCell = document.createElement("div");
@@ -732,10 +1250,10 @@
                 cycleDay = cycleDayOf(currentDate);
                 if (cycleDay === 0) {
                     dateCell.classList.add("green");
-                    dutyCount++;
+                    if (currentDate >= startOfToday) dutyCount++;
                 } else {
                     dateCell.classList.add("white");
-                    freeCount++;
+                    if (currentDate >= startOfToday) freeCount++;
                 }
             } else {
                 dateCell.classList.add("out-of-service");
@@ -765,6 +1283,15 @@
                 dateCell.classList.add("today");
             }
 
+            // Note indicator + click-to-edit
+            const cellDate = new Date(currentDate);
+            const key = dateKey(cellDate);
+            if (notes[key]) {
+                dateCell.classList.add("has-note");
+                dateCell.title = notes[key];
+            }
+            dateCell.addEventListener("click", () => openNoteModal(cellDate));
+
             // Tomorrow message
             if (currentDate.getFullYear() === tomorrow.getFullYear() &&
                 currentDate.getMonth() === tomorrow.getMonth() &&
@@ -792,18 +1319,33 @@
         document.getElementById("next-btn").disabled = (currentYear === maxYear && currentMonth === maxMonth);
     }
 
+    function animatedMonthChange(direction) {
+        const cal = document.getElementById("calendar");
+        const outClass = direction === "next" ? "flip-out-next" : "flip-out-prev";
+        const inClass = direction === "next" ? "flip-in-next" : "flip-in-prev";
+
+        cal.classList.add(outClass);
+
+        setTimeout(() => {
+            generateCalendar();
+            cal.classList.remove(outClass);
+            cal.classList.add(inClass);
+            setTimeout(() => cal.classList.remove(inClass), 300);
+        }, 200);
+    }
+
     function prevMonth() {
         if (currentYear === minYear && currentMonth === minMonth) return;
         currentMonth--;
         if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-        generateCalendar();
+        animatedMonthChange("prev");
     }
 
     function nextMonth() {
         if (currentYear === maxYear && currentMonth === maxMonth) return;
         currentMonth++;
         if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-        generateCalendar();
+        animatedMonthChange("next");
     }
 
     generateCalendar();
